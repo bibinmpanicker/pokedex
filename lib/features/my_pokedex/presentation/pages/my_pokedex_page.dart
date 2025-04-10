@@ -19,34 +19,41 @@ class MyPokedexPage extends ConsumerStatefulWidget {
 class MyPokedexPageState extends ConsumerState<MyPokedexPage> {
   final _scrollController = ScrollController();
 
-  Widget _buildBody(List<Pokemon> state) {
+  Widget _buildBody(List<Pokemon> pokemon) {
     final generatedChildren = List.generate(
-      state.length,
-      (index) => _itemView(state[index]),
+      pokemon.length,
+      (index) => _itemView(pokemon[index]),
     );
-    return ReorderableBuilder(
-      positionDuration: Duration.zero,
-      releasedChildDuration: Duration.zero,
-      scrollController: _scrollController,
-      onReorder: (ReorderedListFunction reorderedListFunction) {
-        final List<Pokemon> newList =
-            reorderedListFunction(state) as List<Pokemon>;
-        ref.read(myPokedexProvider.notifier).reorderPokemon(newList);
-      },
-      builder: (children) {
-        return GridView(
-          controller: _scrollController,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1 / 1.5,
+    return pokemon.isEmpty
+        ? Center(
+          child: Text(
+            'No saved Pokemon!!',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
           ),
-          children: children,
+        )
+        : ReorderableBuilder(
+          positionDuration: Duration.zero,
+          releasedChildDuration: Duration.zero,
+          scrollController: _scrollController,
+          onReorder: (ReorderedListFunction reorderedListFunction) {
+            final List<Pokemon> newList =
+                reorderedListFunction(pokemon) as List<Pokemon>;
+            ref.read(myPokedexProvider.notifier).reorderPokemon(newList);
+          },
+          builder: (children) {
+            return GridView(
+              controller: _scrollController,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 1 / 1.5,
+              ),
+              children: children,
+            );
+          },
+          children: generatedChildren,
         );
-      },
-      children: generatedChildren,
-    );
   }
 
   Widget _itemView(Pokemon pokemon) {
