@@ -3,6 +3,7 @@ import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pokedex/core/providers/repository_providers.dart';
 import 'package:pokedex/core/utils/utils.dart';
+import 'package:pokedex/features/my_pokedex/presentation/wdgets/card_item_view.dart';
 import 'package:pokedex/features/my_pokedex/states/my_pokedex_provider.dart';
 import 'package:pokedex/features/search/models/pokemon.dart';
 
@@ -12,19 +13,18 @@ class MyPokedexPage extends ConsumerStatefulWidget {
   static const route = '/my_pokedex';
 
   @override
-  _MyPokedexPageState createState() => _MyPokedexPageState();
+  MyPokedexPageState createState() => MyPokedexPageState();
 }
 
-class _MyPokedexPageState extends ConsumerState<MyPokedexPage> {
+class MyPokedexPageState extends ConsumerState<MyPokedexPage> {
   final _scrollController = ScrollController();
 
   Widget _buildBody(List<Pokemon> state) {
     final generatedChildren = List.generate(
       state.length,
-      (index) => _Item(state[index]),
+      (index) => _itemView(state[index]),
     );
     return ReorderableBuilder(
-      children: generatedChildren,
       positionDuration: Duration.zero,
       releasedChildDuration: Duration.zero,
       scrollController: _scrollController,
@@ -35,7 +35,6 @@ class _MyPokedexPageState extends ConsumerState<MyPokedexPage> {
       },
       builder: (children) {
         return GridView(
-          children: children,
           controller: _scrollController,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -43,104 +42,18 @@ class _MyPokedexPageState extends ConsumerState<MyPokedexPage> {
             crossAxisSpacing: 8,
             childAspectRatio: 1 / 1.5,
           ),
+          children: children,
         );
       },
+      children: generatedChildren,
     );
   }
 
-  Widget _Item(Pokemon pokemon) {
+  Widget _itemView(Pokemon pokemon) {
     return Stack(
       key: ValueKey(pokemon.name),
       children: [
-        Card(
-          margin: const EdgeInsets.all(8),
-          elevation: 6,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Image.network(
-                    pokemon.sprites.other.officialArtwork.frontDefault,
-                    fit: BoxFit.fill,
-                    scale: 5,
-                    filterQuality: FilterQuality.high,
-                  ),
-                ),
-                Spacer(),
-
-                Row(
-                  children: [
-                    Text(
-                      pokemon.name.toString().toUpperCase(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Spacer(),
-                  ],
-                ),
-                Spacer(),
-
-                const Divider(),
-                Spacer(),
-                RichText(
-                  text: TextSpan(
-                    text: 'Abilities:',
-                    // base text
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      color: Colors.black,
-                    ),
-                    // base style
-                    children: [
-                      TextSpan(
-                        text:
-                            ' ${pokemon.abilities.map((e) => '#${e.ability.name}').toList().join(', ')}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    text: 'Moves:',
-                    // base text
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      color: Colors.black,
-                    ),
-                    // base style
-                    children: [
-                      TextSpan(
-                        text:
-                            ' ${pokemon.moves.take(3).map((e) => '#${e.move.name}').toList().join(', ')}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        CardItemView(pokemon: pokemon),
         Positioned(
           top: 8,
           right: 4,

@@ -17,7 +17,6 @@ class PokemonList {
     previous: json["previous"],
     results: List<Result>.from(json["results"].map((x) => Result.fromJson(x))),
   );
-
 }
 
 class Result {

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pokedex/core/prefs/prefs_connector.dart';
 import 'package:pokedex/features/login/presentation/pages/login_page.dart';
 import 'package:pokedex/features/my_pokedex/presentation/pages/my_pokedex_page.dart';
-import 'package:pokedex/features/search/models/pokemon_list.dart';
+import 'package:pokedex/features/my_pokedex/presentation/wdgets/card_item_view.dart';
 import 'package:pokedex/features/search/states/search_notifier.dart';
 
 import '../../../core/utils/utils.dart';
@@ -16,10 +16,10 @@ class SearchPage extends ConsumerStatefulWidget {
   static const route = '/home';
 
   @override
-  _SearchPageState createState() => _SearchPageState();
+  SearchPageState createState() => SearchPageState();
 }
 
-class _SearchPageState extends ConsumerState<SearchPage> {
+class SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
 
   void _searchPokemon() async {
@@ -54,9 +54,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _buildBody(List<Pokemon> state) {
+  Widget _buildBody(List<Pokemon> pokemon) {
     return GridView.builder(
-      itemCount: state.length,
+      itemCount: pokemon.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 8,
@@ -66,95 +66,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       itemBuilder: (context, index) {
         return Stack(
           children: [
-            Card(
-              margin: const EdgeInsets.all(8),
-              elevation: 6,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Image.network(
-                        state[index].sprites.other.officialArtwork.frontDefault,
-                        fit: BoxFit.fill,
-                        scale: 5,
-                        filterQuality: FilterQuality.high,
-                      ),
-                    ),
-                    Spacer(),
-
-                    Row(
-                      children: [
-                        Text(
-                          state[index].name.toString().toUpperCase(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Spacer(),
-                      ],
-                    ),
-                    Spacer(),
-
-                    const Divider(),
-                    Spacer(),
-                    RichText(
-                      text: TextSpan(
-                        text: 'Abilities:',
-                        // base text
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: Colors.black,
-                        ),
-                        // base style
-                        children: [
-                          TextSpan(
-                            text:
-                                ' ${state[index].abilities.map((e) => '#${e.ability.name}').toList().join(', ')}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    SizedBox(height: 4),
-                    RichText(
-                      text: TextSpan(
-                        text: 'Moves:',
-                        // base text
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: Colors.black,
-                        ),
-                        // base style
-                        children: [
-                          TextSpan(
-                            text:
-                                ' ${state[index].moves.take(3).map((e) => '#${e.move.name}').toList().join(', ')}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            CardItemView(pokemon: pokemon[index]),
             Positioned(
               top: 8,
               right: 4,
@@ -162,11 +74,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 onPressed: () async {
                   await ref
                       .read(searchProvider.notifier)
-                      .addToPokedex(state[index]);
+                      .addToPokedex(pokemon[index]);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Saved successfully!')),
-                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Saved successfully!')),
+                    );
+                  }
                 },
                 icon: Icon(Icons.bookmark_add_outlined),
               ),
@@ -208,9 +122,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
               if (isConfirmed) {
                 Prefs.clear();
-                context.go(LoginPage.route);
+                if (context.mounted) {
+                  context.go(LoginPage.route);
+                  FocusScope.of(context).unfocus();
+                }
               }
-              FocusScope.of(context).unfocus();
             },
           ),
         ],
@@ -266,6 +182,5 @@ class _ErrorView extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

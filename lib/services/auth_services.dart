@@ -13,9 +13,7 @@ class AuthServices {
   }
 
   Future<dynamic> search(String name) async {
-    final Response response = await dio.get(
-      'v2/pokemon/$name',
-    );
+    final Response response = await dio.get('v2/pokemon/$name');
     return response.data;
   }
 }

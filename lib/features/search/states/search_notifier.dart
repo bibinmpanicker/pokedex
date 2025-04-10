@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,7 +22,7 @@ class SearchNotifier extends AutoDisposeNotifier<SearchState> {
         state = state.copyWith(pokemon: cachedPokemons, isLoading: false);
       } else {
         // pulls 10 random Pokemons from api.
-        Random random = new Random();
+        Random random = Random();
         int offset = random.nextInt(100);
         final PokemonList resModel = await ref
             .read(authRepositoryProvider)
@@ -32,9 +31,7 @@ class SearchNotifier extends AutoDisposeNotifier<SearchState> {
         // calls details api for each pokemon.
         final futures =
             resModel.results.map((e) async {
-              return await await ref
-                  .read(authRepositoryProvider)
-                  .search(e.name);
+              return await ref.read(authRepositoryProvider).search(e.name);
             }).toList();
 
         final s = await Future.wait(futures);
@@ -66,7 +63,6 @@ class SearchNotifier extends AutoDisposeNotifier<SearchState> {
         final Pokemon resModel = await ref
             .read(authRepositoryProvider)
             .search(name);
-        print(resModel);
 
         state = state.copyWith(pokemon: [resModel], isLoading: false);
       }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:pokedex/app.dart';
 import 'package:pokedex/features/search/presentation/search_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -81,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(width: double.infinity,
+                  SizedBox(
+                    width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _handleLogin,
                       child:
@@ -125,11 +126,13 @@ class _LoginPageState extends State<LoginPage> {
 
       setState(() => _isLoading = false);
 
-      context.go(SearchPage.route);
+      router.go(SearchPage.route);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+      }
     }
   }
 }

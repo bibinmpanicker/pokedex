@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:pokedex/core/prefs/prefs_constants.dart';
 
 import '../core/prefs/prefs_connector.dart';
@@ -11,8 +10,8 @@ class StorageServices {
   }
 
   Future<String> loadPokedex() async {
-    final String? pokemon = await Prefs.getString(PrefsConstants.myPokedex);
-    return pokemon ?? '';
+    final String pokemon = Prefs.getString(PrefsConstants.myPokedex);
+    return pokemon;
   }
 
   Future<void> clearMyPokedex() async {
@@ -24,7 +23,7 @@ class StorageServices {
   }
 
   Future<String> loadCachedPokemons() async {
-    final String? pokemon = await Prefs.getString(PrefsConstants.cachedPokemons);
-    return pokemon ?? '';
+    final String pokemon = Prefs.getString(PrefsConstants.cachedPokemons);
+    return pokemon;
   }
 }
